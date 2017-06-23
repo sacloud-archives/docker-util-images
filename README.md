@@ -4,7 +4,7 @@ sacloud配下のプロジェクトで利用するユーティリティ用Docker�
 
 ## License
 
- `usacloud` Copyright (C) 2017 Kazumichi Yamamoto.
+ `docker-util-images` Copyright (C) 2017 Kazumichi Yamamoto.
 
   This project is published under [Apache 2.0 License](LICENSE.txt).
   
