@@ -9,7 +9,8 @@ RUN npm install -g --no-cache textlint \
     textlint-filter-rule-whitelist \
     textlint-filter-rule-comments \
     textlint-rule-common-misspellings \
-    textlint-rule-preset-ja-technical-writing
+    textlint-rule-preset-ja-technical-writing \
+    textlint-rule-preset-jtf-style
 
 WORKDIR /workdir
 ENTRYPOINT ["textlint"]
