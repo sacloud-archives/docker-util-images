@@ -74,14 +74,17 @@ fi
 
 # for deb
 if [ -n "${ENABLE_DEB}" ]; then
-    echo -e "${APP_NAME} (${RELEASE_TO}-1) stable; urgency=low\n" > /tmp/deb_changelog
+    echo "${APP_NAME} (${RELEASE_TO}-1) stable; urgency=low" > /tmp/deb_changelog
+    echo "" >> /tmp/deb_changelog
     cat /tmp/new.json | jq -r '.pull_requests[] | "  * \(.title) (by \(.user.login))\n    <\(.html_url)>"' >> /tmp/deb_changelog
     echo "" >> /tmp/deb_changelog
-    echo -e " -- ${OPT_USER} ${OPT_EMAIL}  $(date '+%a, %d %b %Y %H:%M:%S %z')\n" >> /tmp/deb_changelog
+    echo " -- ${OPT_USER} ${OPT_EMAIL}  $(date '+%a, %d %b %Y %H:%M:%S %z')" >> /tmp/deb_changelog
+    echo "" >> /tmp/deb_changelog
     touch ${OPT_DEB_CHANGELOG_PATH}
     cp ${OPT_DEB_CHANGELOG_PATH} /tmp/old_deb_changelog
     cat /tmp/deb_changelog /tmp/old_deb_changelog > ${OPT_DEB_CHANGELOG_PATH}
 fi
 
-echo -e "## CHANGELOG\n"
+echo "## CHANGELOG"
+echo ""
 cat /tmp/new.json | jq -r '.pull_requests[] | "- \(.title)([GH-\(.number)](\(.html_url)))"'
