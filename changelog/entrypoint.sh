@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # validate parameters
 if [ ! -d "$(pwd)/.git" ]; then
@@ -20,6 +20,13 @@ if [ -z "${APP_NAME}" ]; then
    echo "\$APP_NAME is empty"
    exit 1
 fi
+
+if [ -n "${ENABLE_PR}" -a -z "${REPO_NAME}" ]; then
+   echo "\$REPO_NAME is empty"
+   exit 1
+fi
+
+# set variables with defalt
 
 OPT_TOKEN=""
 if [ -n "${GITHUB_TOKEN}" ]; then
@@ -85,6 +92,30 @@ if [ -n "${ENABLE_DEB}" ]; then
     cat /tmp/deb_changelog /tmp/old_deb_changelog > ${OPT_DEB_CHANGELOG_PATH}
 fi
 
-echo "## CHANGELOG"
-echo ""
-cat /tmp/new.json | jq -r '.pull_requests[] | "- \(.title)([GH-\(.number)](\(.html_url)))"'
+if [ -n "${ENABLE_PR}" ]; then
+    # check latest commit message
+    LATEST_COMMIT_MSG=$(git log --oneline master..HEAD | cut -d ' ' -f2-)
+    if [ "${LATEST_COMMIT_MSG}" = "update changelogs" ]; then
+      echo "skip to update changelogs because the last commit is 'update changelogs'"
+      exit
+    fi
+
+    echo "Release version ${RELEASE_TO}" > /tmp/pr_body
+    echo "" >> /tmp/pr_body
+    echo "" >> /tmp/pr_body
+    cat /tmp/new.json | jq -r '.pull_requests[] | "- \(.title)([GH-\(.number)](\(.html_url)))"' >> /tmp/pr_body
+
+    # commit changes and push to github
+    git config --global user.name "${OPT_USER}" >/dev/null 2>&1
+    git config --global user.email "${OPT_EMAIL}" >/dev/null 2>&1
+    git commit -am "update changelogs" >/dev/null 2>&1
+    git push -u "https://${GITHUB_TOKEN}@github.com/${REPO_NAME}.git" >/dev/null 2>&1
+
+    # create pull request
+    # TODO detect conflict
+    PR_URL=$(hub pull-request -F /tmp/pr_body -b ${REPO_NAME}:master)
+    if [ $? -eq 0 ]; then
+        echo "Release pull-request has been created: ${PR_URL}"
+    fi
+fi
+
