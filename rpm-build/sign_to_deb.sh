@@ -13,4 +13,4 @@ if [ -n "$GPG_PASSPHRASE" -a -n "$GPG_FINGERPRINT" ]; then
     /usr/libexec/gpg-preset-passphrase --passphrase="$GPG_PASSPHRASE" --preset "$GPG_FINGERPRINT"
 fi
 
-gpg -s -b -a --batch --no-verbose --no-armor --use-agent --no-secmem-warning -u "$GPG_NAME" --digest-algo SHA256 -o Release.gpg Release
+gpg -s -b -a --batch --no-verbose --use-agent --no-secmem-warning -u "$GPG_NAME" --digest-algo SHA256 -o Release.gpg Release
